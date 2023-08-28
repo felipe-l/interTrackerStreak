@@ -39,3 +39,4 @@ def getGameResults(games: list, puuid: str):
 # puuid = getSummonerPuuid("bbbitmap")
 # games = getMatchDetails(getGamesByPuuid(puuid))
 # print(getGameResults(games, puuid))
+#TEst
