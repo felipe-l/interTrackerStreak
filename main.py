@@ -2,6 +2,7 @@
 
 import discord
 import modules
+import config
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -21,4 +22,4 @@ async def on_message(message):
     if message.content.startswith('$hello'):
         await message.channel.send('Hello!')
 
-client.run('OTM5Mjk1NzcwMjkxNjM0MjU2.GnVH1M.0qiHkrSf5cKd_O3NhS3Y3ZWityrTQpNZiLP4Go')
+client.run(config.DISCORD_KEY)
