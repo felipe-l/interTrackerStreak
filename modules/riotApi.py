@@ -9,34 +9,40 @@ headers = {
 }
 
 def getSummonerPuuid(summoner: str, server: str = "na1") -> str:
-    r = requests.get("https://" + server + ".api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summoner, headers=headers)
+    r = requests.get(f"https://{server}.api.riotgames.com/lol/summoner/v4/summoners/by-name/{summoner}", headers=headers)
     return r.json()['puuid']
 
 def getSummonerByPuuid(puuid: str, server: str = "na1") -> str:
-    r = requests.get("https://" + server + ".api.riotgames.com/lol/summoner/v4/summoners/by-puuid/" + puuid, headers=headers)
+    r = requests.get(f"https://{server}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}", headers=headers)
     return r.json()
 
 def getGamesByPuuid(puuid: str, queue: int = 420, region: str = "americas", start: int = 0, count: str = 20):
-    r = requests.get("https://" + region + ".api.riotgames.com/lol/match/v5/matches/by-puuid/" + puuid + "/ids?" + str(queue) + "start=" + str(start) + "&count=" + str(count), headers=headers)
+    r = requests.get(f"https://{region}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?{str(queue)}start={str(start)}&count={str(count)}", headers=headers)
     return r.json()
 
 def getMatchDetails(games: list, region: str = "americas"):
     results = []
     for game in games:
-        r = requests.get("https://" + region + ".api.riotgames.com/lol/match/v5/matches/" + game, headers=headers)
+        r = requests.get(f"https://{region}.api.riotgames.com/lol/match/v5/matches/{game}", headers=headers)
         results.append(r.json()["info"])
+
     return results
 
 def getGameResults(games: list, puuid: str):
     result = []
     for game in games:
+        print(game)
         gameId = game['gameId']
         for player in game["participants"]:
             if player['puuid'] == puuid:
                 result.append({gameId: bool(player['win'])})
     return result
 
-# puuid = getSummonerPuuid("bbbitmap")
-# games = getMatchDetails(getGamesByPuuid(puuid))
-# print(getGameResults(games, puuid))
-#TEst
+puuid = getSummonerPuuid("frankbocean")
+print(puuid)
+games = getGamesByPuuid(puuid)
+print("games", games)
+matchDetails = getMatchDetails(games)
+results = getGameResults(matchDetails, puuid)
+print(results)
+
