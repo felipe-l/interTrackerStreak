@@ -39,11 +39,5 @@ def getGameResults(games: list, puuid: str):
                 result.append({gameId: bool(player['win'])})
     return result
 
-puuid = getSummonerPuuid("frankbocean")
-print(puuid)
-games = getGamesByPuuid(puuid)
-print("games", games)
-matchDetails = getMatchDetails(games)
-results = getGameResults(matchDetails, puuid)
-print(results)
+
 
