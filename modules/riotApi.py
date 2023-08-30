@@ -18,7 +18,7 @@ def getSummonerByPuuid(puuid: str, server: str = "na1") -> str:
     return r.json()
 
 def getGamesByPuuid(puuid: str, queue: int = 420, region: str = "americas", start: int = 0, count: str = 20):
-    r = requests.get(f"https://{region}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?{str(queue)}start={str(start)}&count={str(count)}", headers=headers)
+    r = requests.get(f"https://{region}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?queue={str(queue)}&start={str(start)}&count={str(count)}", headers=headers)
     return r.json()
 
 def getMatchDetails(games: list, region: str = "americas"):
@@ -29,15 +29,20 @@ def getMatchDetails(games: list, region: str = "americas"):
 
     return results
 
-def getGameResults(games: list, puuid: str):
+def getGameResults(matchDetails: list, puuid: str):
     result = []
-    for game in games:
-        print(game)
+    for game in matchDetails:
         gameId = game['gameId']
         for player in game["participants"]:
             if player['puuid'] == puuid:
-                result.append({gameId: bool(player['win'])})
+                result.append((gameId, bool(player['win'])))
+    print(result)
     return result
 
-
+# puuid = getSummonerPuuid("bbbitmap")
+# games = getGamesByPuuid(puuid)
+# matchDetails = getMatchDetails(games)
+#
+# for x,y in getGameResults(matchDetails, puuid):
+#     print(x,y)
 
