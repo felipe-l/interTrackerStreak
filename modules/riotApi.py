@@ -36,13 +36,5 @@ def getGameResults(matchDetails: list, puuid: str):
         for player in game["participants"]:
             if player['puuid'] == puuid:
                 result.append((gameId, bool(player['win'])))
-    print(result)
     return result
-
-# puuid = getSummonerPuuid("bbbitmap")
-# games = getGamesByPuuid(puuid)
-# matchDetails = getMatchDetails(games)
-#
-# for x,y in getGameResults(matchDetails, puuid):
-#     print(x,y)
 

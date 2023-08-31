@@ -19,7 +19,6 @@ def detectStreak(resultList: list, lastGame: str, lastStreakCount: int) -> dict:
 
     #No changes, prevents database update when not necessary
     if connected and streakCount == 0:
-        print("NO CHANGES")
         return None
 
     totalStreak = streakCount
@@ -43,13 +42,10 @@ def setStreak(player: str):
 
     streakDetails = detectStreak(matchResults, lastGame, lastStreakCount)
 
-    print("DATA HERE:", lastGame, streakDetails)
     if streakDetails is not None:
         if lastGame is None:
-            print("ADDED TO DB")
             databaseFunctions.insertUserData(player, streakDetails["winStreak"], streakDetails["streakCount"], streakDetails["lastGame"], "false")
         else:
-            print("UPDATED DB")
             databaseFunctions.updateUserStreak(player, streakDetails["winStreak"], streakDetails["streakCount"], streakDetails["lastGame"], "false")
 
     return streakDetails
@@ -59,14 +55,7 @@ def updateSummonerStreaks(summoners):
         setStreak(summ)
 
 def runMain():
-    print("!STARTED BACKEND!")
     while True:
         updateSummonerStreaks(players)
         time.sleep(120)
-        print("updated database")
-        print("PRINTING DATABASE ....")
-        rows = databaseFunctions.selectAllUserData()
-        for row in rows:
-            print(row)
-        print("NEXT RUN")
 runMain()
