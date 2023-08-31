@@ -51,7 +51,7 @@ def insertUserData(summoner, win_streak, streak_count, last_game_id, posted):
 def getNewStreakData(streakNum):
     cursor.execute('''
         SELECT * FROM player_data
-        WHERE posted = 'false' AND streak_ount = ?
+        WHERE posted = 'false' AND streak_count = ?
     ''', (streakNum,))
     conn.commit()
 

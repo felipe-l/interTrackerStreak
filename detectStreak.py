@@ -1,6 +1,7 @@
 from modules import databaseFunctions
 from modules import riotApi
 import time
+from urllib.parse import quote
 from config import PLAYERS_TO_TRACK as players
 
 def detectStreak(resultList: list, lastGame: str, lastStreakCount: int) -> dict:
@@ -29,7 +30,7 @@ def detectStreak(resultList: list, lastGame: str, lastStreakCount: int) -> dict:
     return {"streakCount": streakCount, "winStreak": streakTypeWin, "streakChanged": not connected, "lastGame": newLastGame}
 
 def setStreak(player: str):
-    puuid = riotApi.getSummonerPuuid(player)
+    puuid = riotApi.getSummonerPuuid(quote(player))
     games = riotApi.getGamesByPuuid(puuid)
     matchDetails = riotApi.getMatchDetails(games)
     matchResults = riotApi.getGameResults(matchDetails, puuid)
