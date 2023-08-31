@@ -1,9 +1,10 @@
-from . import databaseFunctions
-from . import riotApi
+from modules import databaseFunctions
+from modules import riotApi
+import time
 
-players = ["roxas"]
+players = ["roxas", "bbbitmap"]
 
-def detectStreak(resultList: list, lastGame: str) -> dict:
+def detectStreak(resultList: list, lastGame: str, lastStreakCount: int) -> dict:
     streakCount = 0
     newLastGame, streakTypeWin = resultList[0]
     connected = False
@@ -24,35 +25,49 @@ def detectStreak(resultList: list, lastGame: str) -> dict:
 
     totalStreak = streakCount
     if connected:
-        # ADD DATABASE VALUE AND CHANGE STREAK COUNT
-        totalStreak += 0
-    else:
-        # STREAK TYPE CHANGED SO ADD STREAK TYPE AND TOTALSTREAK TO DB
-        pass
+        totalStreak += lastStreakCount
+
+
     return {"streakCount": streakCount, "winStreak": streakTypeWin, "streakChanged": not connected, "lastGame": newLastGame}
-def setStreak(player: str, ):
+
+def setStreak(player: str):
     puuid = riotApi.getSummonerPuuid(player)
     games = riotApi.getGamesByPuuid(puuid)
     matchDetails = riotApi.getMatchDetails(games)
     matchResults = riotApi.getGameResults(matchDetails, puuid)
 
     lastGame = databaseFunctions.selectUserData(player)
+    lastStreakCount = 0
     if lastGame is not None:
-        lastGame = lastGame[-1]
+        lastStreakCount = lastGame[2]
+        lastGame = lastGame[3]
 
-    streakDetails = detectStreak(matchResults, lastGame)
+    streakDetails = detectStreak(matchResults, lastGame, lastStreakCount)
 
     print("DATA HERE:", lastGame, streakDetails)
     if streakDetails is not None:
         if lastGame is None:
             print("ADDED TO DB")
-            databaseFunctions.insertUserData(player, streakDetails["winStreak"], streakDetails["streakCount"], streakDetails["lastGame"])
+            databaseFunctions.insertUserData(player, streakDetails["winStreak"], streakDetails["streakCount"], streakDetails["lastGame"], "false")
         else:
             print("UPDATED DB")
-            databaseFunctions.updateUserStreak(player, streakDetails["winStreak"], streakDetails["streakCount"], streakDetails["lastGame"])
+            databaseFunctions.updateUserStreak(player, streakDetails["winStreak"], streakDetails["streakCount"], streakDetails["lastGame"], "false")
 
     return streakDetails
 
 def updateSummonerStreaks(summoners):
     for summ in summoners:
         setStreak(summ)
+
+def runMain():
+    print("!STARTED BACKEND!")
+    while True:
+        updateSummonerStreaks(players)
+        time.sleep(120)
+        print("updated database")
+        print("PRINTING DATABASE ....")
+        rows = databaseFunctions.selectAllUserData()
+        for row in rows:
+            print(row)
+        print("NEXT RUN")
+runMain()
