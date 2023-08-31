@@ -36,10 +36,11 @@ def setStreak(player: str):
     matchResults = riotApi.getGameResults(matchDetails, puuid)
 
     lastGame = databaseFunctions.selectUserData(player)
+    print("LAST GAME", lastGame)
     lastStreakCount = 0
     if lastGame is not None:
         lastStreakCount = lastGame[2]
-        lastGame = lastGame[3]
+        lastGame = lastGame[4]
 
     streakDetails = detectStreak(matchResults, lastGame, lastStreakCount)
 
@@ -53,6 +54,7 @@ def setStreak(player: str):
 
 def updateSummonerStreaks(summoners):
     for summ in summoners:
+        time.sleep(30)
         setStreak(summ)
 
 def runMain():
