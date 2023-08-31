@@ -1,6 +1,6 @@
 # League of Legends Discord Win Streak Tracker
 
-![Project Logo](interLogo.png)
+![Project Logo](images/interLogo.png)
 
 ## Overview
 
