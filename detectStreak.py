@@ -9,14 +9,14 @@ def detectStreak(resultList: list, lastGame: str, lastStreakCount: int) -> dict:
     newLastGame, streakTypeWin = resultList[0]
     connected = False
     for gameId,winStreak in resultList:
-        if gameId == lastGame:
-            connected = True
-            break
-        else:
-            if winStreak == streakTypeWin:
-                streakCount += 1
-            else:
+        if winStreak == streakTypeWin:
+            if gameId == lastGame:
+                connected = True
                 break
+            else:
+                streakCount += 1
+        else:
+            break
 
     #No changes, prevents database update when not necessary
     if connected and streakCount == 0:
