@@ -1,8 +1,7 @@
 from modules import databaseFunctions
 from modules import riotApi
 import time
-
-players = ["roxas", "bbbitmap"]
+from config import PLAYERS_TO_TRACK as players
 
 def detectStreak(resultList: list, lastGame: str, lastStreakCount: int) -> dict:
     streakCount = 0

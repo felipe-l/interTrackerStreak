@@ -65,3 +65,8 @@ def selectAllUserData():
 # Close the database connection
 def closeConnection():
     conn.close()
+
+def initialize_database():
+    createTable()
+
+initialize_database()
