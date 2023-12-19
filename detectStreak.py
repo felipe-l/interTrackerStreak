@@ -26,11 +26,10 @@ def detectStreak(resultList: list, lastGame: str, lastStreakCount: int) -> dict:
     if connected:
         totalStreak += lastStreakCount
 
-
     return {"streakCount": streakCount, "winStreak": streakTypeWin, "streakChanged": not connected, "lastGame": newLastGame}
 
-def setStreak(player: str):
-    puuid = riotApi.getSummonerPuuid(quote(player))
+def setStreak(player: str, tagLine: str):
+    puuid = riotApi.getPuuidByTagLine(quote(player), tagLine)
     games = riotApi.getGamesByPuuid(puuid)
     matchDetails = riotApi.getMatchDetails(games)
     matchResults = riotApi.getGameResults(matchDetails, puuid)
@@ -43,19 +42,25 @@ def setStreak(player: str):
         lastGame = lastGame[4]
 
     streakDetails = detectStreak(matchResults, lastGame, lastStreakCount)
-
     if streakDetails is not None:
         if lastGame is None:
             databaseFunctions.insertUserData(player, streakDetails["winStreak"], streakDetails["streakCount"], streakDetails["lastGame"], "false")
         else:
-            databaseFunctions.updateUserStreak(player, streakDetails["winStreak"], streakDetails["streakCount"], streakDetails["lastGame"], "false")
+            # Check if changes in order to prevent posting on discord multiple times, we don't want to change false.
+            if str(lastGame) != str(streakDetails["lastGame"]):
+                print("Update on summoner:", sum)
+                databaseFunctions.updateUserStreak(player, streakDetails["winStreak"], streakDetails["streakCount"], streakDetails["lastGame"], "false")
 
     return streakDetails
 
-def updateSummonerStreaks(summoners):
-    for summ in summoners:
+def updateSummonerStreaks(summoners: dict):
+    for summ, tag in summoners.items():
         time.sleep(30)
-        setStreak(summ)
+        try:
+            setStreak(summ, tag)
+        except Exception as e:
+            print("Failed to set streak:", summ)
+            print(e)
 
 def runMain():
     while True:

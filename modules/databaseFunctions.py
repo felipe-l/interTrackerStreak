@@ -6,6 +6,9 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Construct the path to the database file
 db_path = os.path.join(script_dir, 'my_database.db')
+print(f"Database Path: {db_path}")
+
+print("HELLO")
 
 conn = sqlite3.connect(db_path)
 
@@ -32,13 +35,13 @@ def selectUserData(summoner):
 
 
 def updateUserStreak(summoner, win_streak, streak_count, last_game_id, posted):
+    # Consider updating by id rather than summoner name
     cursor.execute('''
         UPDATE player_data
         SET win_streak = ?, streak_count = ?, last_game_id = ?, posted = ?
         WHERE summoner = ?
     ''', (win_streak, streak_count, last_game_id, posted, summoner))
     conn.commit()
-
 
 # Insert a new user's data
 def insertUserData(summoner, win_streak, streak_count, last_game_id, posted):
@@ -54,6 +57,7 @@ def getNewStreakData(streakNum):
         WHERE posted = 'false' AND streak_count = ?
     ''', (streakNum,))
     conn.commit()
+    return cursor.fetchall()
 
 
 # Select all user data

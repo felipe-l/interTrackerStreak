@@ -9,6 +9,10 @@ headers = {
     "X-Riot-Token": config.RIOT_KEY
 }
 
+def getPuuidByTagLine(summoner: str, tagLine: str, region: str = "americas") -> str:
+    r = requests.get(f"https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{summoner}/{tagLine}", headers=headers)
+    return r.json()['puuid']
+
 def getSummonerPuuid(summoner: str, server: str = "na1") -> str:
     r = requests.get(f"https://{server}.api.riotgames.com/lol/summoner/v4/summoners/by-name/{summoner}", headers=headers)
     return r.json()['puuid']
@@ -23,18 +27,28 @@ def getGamesByPuuid(puuid: str, queue: int = 420, region: str = "americas", star
 
 def getMatchDetails(games: list, region: str = "americas"):
     results = []
-    for game in games:
-        r = requests.get(f"https://{region}.api.riotgames.com/lol/match/v5/matches/{game}", headers=headers)
-        results.append(r.json()["info"])
+    try:
+        for game in games:
+            r = requests.get(f"https://{region}.api.riotgames.com/lol/match/v5/matches/{game}", headers=headers)
+            results.append(r.json()["info"])
+    except:
+        print("ERROR ON MATCH DETAILS: ", games)
+        raise
 
     return results
 
 def getGameResults(matchDetails: list, puuid: str):
     result = []
-    for game in matchDetails:
-        gameId = game['gameId']
-        for player in game["participants"]:
-            if player['puuid'] == puuid:
-                result.append((gameId, bool(player['win'])))
+    try:
+        for game in matchDetails:
+            gameId = game['gameId']
+            # This is to check if the game is not a remake
+            if not bool(game["participants"][0]["gameEndedInEarlySurrender"]):
+                for player in game["participants"]:
+                    if player['puuid'] == puuid:
+                        result.append((gameId, bool(player['win'])))
+    except Exception: 
+        print("ERROR ON GAME RESULTS: ", matchDetails)
+        raise
     return result
 

@@ -4,6 +4,9 @@ config.py
 __pycache__/
 *.py[cod]
 *$py.class
+modules/__pycache__/
+scratchPad.py
+modules/my_database.db
 
 # C extensions
 *.so
