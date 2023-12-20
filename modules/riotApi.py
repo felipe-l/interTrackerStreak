@@ -37,6 +37,11 @@ def getMatchDetails(games: list, region: str = "americas"):
 
     return results
 
+def getChampionPlayed(puuid: str, gameId: dict):
+    for participant in gameId["participants"]:
+        if puuid == str(participant["puuid"]):
+            return participant["championName"]
+
 def getGameResults(matchDetails: list, puuid: str):
     result = []
     try:
@@ -46,7 +51,7 @@ def getGameResults(matchDetails: list, puuid: str):
             if not bool(game["participants"][0]["gameEndedInEarlySurrender"]):
                 for player in game["participants"]:
                     if player['puuid'] == puuid:
-                        result.append((gameId, bool(player['win'])))
+                        result.append((gameId, bool(player['win']), getChampionPlayed(puuid, game)))
     except Exception: 
         print("ERROR ON GAME RESULTS: ", matchDetails)
         raise

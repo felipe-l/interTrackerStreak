@@ -4,9 +4,9 @@ import time
 from urllib.parse import quote
 from config import PLAYERS_TO_TRACK as players
 
-def detectStreak(resultList: list, lastGame: str, lastStreakCount: int) -> dict:
+def detectStreak(resultList: list, lastGame: str, lastStreakCount: int, lastChampionPick: str) -> dict:
     streakCount = 0
-    newLastGame, streakTypeWin = resultList[0]
+    newLastGame, streakTypeWin, newLastChampionPick = resultList[0]
     connected = False
     for gameId,winStreak in resultList:
         if winStreak == streakTypeWin:
@@ -26,7 +26,7 @@ def detectStreak(resultList: list, lastGame: str, lastStreakCount: int) -> dict:
     if connected:
         totalStreak += lastStreakCount
 
-    return {"streakCount": streakCount, "winStreak": streakTypeWin, "streakChanged": not connected, "lastGame": newLastGame}
+    return {"streakCount": streakCount, "winStreak": streakTypeWin, "streakChanged": not connected, "lastGame": newLastGame, "lastChampion": newLastChampionPick}
 
 def setStreak(player: str, tagLine: str):
     puuid = riotApi.getPuuidByTagLine(quote(player), tagLine)
@@ -37,19 +37,21 @@ def setStreak(player: str, tagLine: str):
     lastGame = databaseFunctions.selectUserData(player)
     print("LAST GAME", lastGame)
     lastStreakCount = 0
+    lastChampion = None
     if lastGame is not None:
         lastStreakCount = lastGame[2]
         lastGame = lastGame[4]
+        lastChampionPick = lastGame[6]
 
-    streakDetails = detectStreak(matchResults, lastGame, lastStreakCount)
+    streakDetails = detectStreak(matchResults, lastGame, lastStreakCount, lastChampionPick)
     if streakDetails is not None:
         if lastGame is None:
-            databaseFunctions.insertUserData(player, streakDetails["winStreak"], streakDetails["streakCount"], streakDetails["lastGame"], "false")
+            databaseFunctions.insertUserData(player, streakDetails["winStreak"], streakDetails["streakCount"], streakDetails["lastGame"], "false", streakDetails["lastChampion"])
         else:
             # Check if changes in order to prevent posting on discord multiple times, we don't want to change false.
             if str(lastGame) != str(streakDetails["lastGame"]):
                 print("Update on summoner:", sum)
-                databaseFunctions.updateUserStreak(player, streakDetails["winStreak"], streakDetails["streakCount"], streakDetails["lastGame"], "false")
+                databaseFunctions.updateUserStreak(player, streakDetails["winStreak"], streakDetails["streakCount"], streakDetails["lastGame"], "false", streakDetails["lastChampion"])
 
     return streakDetails
 
