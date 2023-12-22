@@ -6,11 +6,11 @@ from config import PLAYERS_TO_TRACK as players
 
 def detectStreak(resultList: list, lastGame: str, lastStreakCount: int, lastChampionPick: str) -> dict:
     streakCount = 0
-    newLastGame, streakTypeWin, newLastChampionPick = resultList[0]
+    newLastGame, newStreakTypeWin, newLastChampionPick = resultList[0]
     connected = False
-    for gameId,winStreak in resultList:
-        if winStreak == streakTypeWin:
-            if gameId == lastGame:
+    for currGameId, currStreakTypeWin, currChampionPick in resultList:
+        if currStreakTypeWin == newStreakTypeWin:
+            if currGameId == lastGame:
                 connected = True
                 break
             else:
@@ -26,7 +26,7 @@ def detectStreak(resultList: list, lastGame: str, lastStreakCount: int, lastCham
     if connected:
         totalStreak += lastStreakCount
 
-    return {"streakCount": streakCount, "winStreak": streakTypeWin, "streakChanged": not connected, "lastGame": newLastGame, "lastChampion": newLastChampionPick}
+    return {"streakCount": streakCount, "winStreak": newStreakTypeWin, "streakChanged": not connected, "lastGame": newLastGame, "lastChampion": newLastChampionPick}
 
 def setStreak(player: str, tagLine: str):
     puuid = riotApi.getPuuidByTagLine(quote(player), tagLine)
@@ -37,7 +37,7 @@ def setStreak(player: str, tagLine: str):
     lastGame = databaseFunctions.selectUserData(player)
     print("LAST GAME", lastGame)
     lastStreakCount = 0
-    lastChampion = None
+    lastChampionPick = None
     if lastGame is not None:
         lastStreakCount = lastGame[2]
         lastGame = lastGame[4]
@@ -50,7 +50,7 @@ def setStreak(player: str, tagLine: str):
         else:
             # Check if changes in order to prevent posting on discord multiple times, we don't want to change false.
             if str(lastGame) != str(streakDetails["lastGame"]):
-                print("Update on summoner:", sum)
+                print("Update on summoner:", player)
                 databaseFunctions.updateUserStreak(player, streakDetails["winStreak"], streakDetails["streakCount"], streakDetails["lastGame"], "false", streakDetails["lastChampion"])
 
     return streakDetails
@@ -63,6 +63,8 @@ def updateSummonerStreaks(summoners: dict):
         except Exception as e:
             print("Failed to set streak:", summ)
             print(e)
+            import traceback
+            traceback.print_exc()
 
 def runMain():
     while True:

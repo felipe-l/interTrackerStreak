@@ -22,7 +22,8 @@ def createTable():
         win_streak TEXT,
         streak_count INTEGER,
         last_game_id TEXT,
-        posted TEXT
+        posted TEXT,
+        last_game_champion TEXT
     )
     '''
     cursor.execute(create_table_query)
@@ -34,21 +35,21 @@ def selectUserData(summoner):
     return cursor.fetchone()
 
 
-def updateUserStreak(summoner, win_streak, streak_count, last_game_id, posted):
+def updateUserStreak(summoner, win_streak, streak_count, last_game_id, posted, last_game_champion):
     # Consider updating by id rather than summoner name
     cursor.execute('''
         UPDATE player_data
-        SET win_streak = ?, streak_count = ?, last_game_id = ?, posted = ?
+        SET win_streak = ?, streak_count = ?, last_game_id = ?, posted = ?, last_game_champion = ?
         WHERE summoner = ?
-    ''', (win_streak, streak_count, last_game_id, posted, summoner))
+    ''', (win_streak, streak_count, last_game_id, posted, last_game_champion, summoner))
     conn.commit()
 
 # Insert a new user's data
-def insertUserData(summoner, win_streak, streak_count, last_game_id, posted):
+def insertUserData(summoner, win_streak, streak_count, last_game_id, posted, last_game_champion):
     cursor.execute('''
-        INSERT OR REPLACE INTO player_data (summoner, win_streak, streak_count, last_game_id, posted)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (summoner, win_streak, streak_count, last_game_id, posted))
+        INSERT OR REPLACE INTO player_data (summoner, win_streak, streak_count, last_game_id, posted, last_game_champion)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (summoner, win_streak, streak_count, last_game_id, posted, last_game_champion))
     conn.commit()
 
 def getNewStreakData(streakNum):
